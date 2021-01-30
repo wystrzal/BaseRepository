@@ -40,16 +40,14 @@ namespace BaseRepository
             return await dataContext.Set<TEntity>().ToListAsync();
         }
 
-        public async Task<List<TEntity>> GetByConditionToList(Func<TEntity, bool> condition)
+        public async Task<List<TEntity>> GetByConditionToList(Expression<Func<TEntity, bool>> condition)
         {
-            var data = dataContext.Set<TEntity>().Where(condition).ToList();
-            return await Task.FromResult(data);
+            return await dataContext.Set<TEntity>().Where(condition).ToListAsync();
         }
 
-        public async Task<TEntity> GetByConditionFirst(Func<TEntity, bool> condition)
+        public async Task<TEntity> GetByConditionFirst(Expression<Func<TEntity, bool>> condition)
         {
-            var data = dataContext.Set<TEntity>().Where(condition).FirstOrDefault();
-            return data == null ? throw new NullDataException() : await Task.FromResult(data);
+            return await dataContext.Set<TEntity>().Where(condition).FirstOrDefaultAsync() ?? throw new NullDataException();
         }
 
         public async Task<TEntity> GetById(int id)
@@ -57,17 +55,16 @@ namespace BaseRepository
             return await dataContext.Set<TEntity>().FindAsync(id) ?? throw new NullDataException();
         }
 
-        public async Task<TEntity> GetByConditionWithIncludeFirst<TProp>(Func<TEntity, bool> condition,
+        public async Task<TEntity> GetByConditionWithIncludeFirst<TProp>(Expression<Func<TEntity, bool>> condition,
             Expression<Func<TEntity, TProp>> include)
         {
-            var data = dataContext.Set<TEntity>().Include(include).Where(condition).FirstOrDefault();
-            return data == null ? throw new NullDataException() : await Task.FromResult(data);
+            return await dataContext.Set<TEntity>().Include(include).Where(condition).FirstOrDefaultAsync() ?? throw new NullDataException();
         }
 
-        public async Task<List<TEntity>> GetByConditionWithIncludeToList<TProp>(Func<TEntity, bool> condition, Expression<Func<TEntity, TProp>> include)
+        public async Task<List<TEntity>> GetByConditionWithIncludeToList<TProp>(Expression<Func<TEntity, bool>> condition,
+            Expression<Func<TEntity, TProp>> include)
         {
-            var data = dataContext.Set<TEntity>().Include(include).Where(condition).ToList();
-            return await Task.FromResult(data);
+            return await dataContext.Set<TEntity>().Include(include).Where(condition).ToListAsync();
         }
 
         public async Task<bool> SaveAllAsync()
@@ -75,10 +72,9 @@ namespace BaseRepository
             return await dataContext.SaveChangesAsync() > 0 ? true : throw new ChangesNotSavedCorrectlyException(typeof(TEntity));
         }
 
-        public async Task<bool> CheckIfExistByCondition(Func<TEntity, bool> condition)
+        public async Task<bool> CheckIfExistByCondition(Expression<Func<TEntity, bool>> condition)
         {
-            var data = dataContext.Set<TEntity>().Where(condition).Any();
-            return await Task.FromResult(data);
+            return await dataContext.Set<TEntity>().Where(condition).AnyAsync();
         }
     }
 }
